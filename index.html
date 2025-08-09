@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Electric Bill Calculator</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: white;
+        color: black;
+        margin: 0;
+        padding: 0;
+    }
+    header {
+        background-color: black;
+        color: white;
+        text-align: center;
+        padding: 15px;
+        font-size: 1.3em;
+    }
+    .container {
+        padding: 15px;
+        max-width: 500px;
+        margin: auto;
+    }
+    input, button {
+        width: 100%;
+        padding: 10px;
+        margin: 8px 0;
+        font-size: 1em;
+        border: 1px solid black;
+        border-radius: 5px;
+        box-sizing: border-box;
+    }
+    button {
+        background-color: black;
+        color: white;
+        cursor: pointer;
+    }
+    button:hover {
+        background-color: #333;
+    }
+    .room {
+        border: 1px solid black;
+        border-radius: 5px;
+        padding: 15px;
+        margin-top: 15px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+    .room h3 {
+        margin: 0 0 5px 0;
+        font-size: 1.1em;
+    }
+    label {
+        font-size: 0.9em;
+        margin-bottom: 3px;
+    }
+    .result {
+        font-weight: bold;
+        margin-top: 5px;
+    }
+    .total {
+        font-size: 1.2em;
+        text-align: center;
+        margin-top: 15px;
+        padding: 10px;
+        border-top: 2px solid black;
+    }
+    table {
+        border-collapse: collapse;
+        width: 100%;
+        background: white;
+        font-size: 14px;
+    }
+    th, td {
+        border: 1px solid black;
+        padding: 8px;
+        text-align: center;
+    }
+    th {
+        background-color: black;
+        color: white;
+    }
+    /* Modal Styles */
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 10;
+        left: 0; top: 0;
+        width: 100%; height: 100%;
+        background-color: rgba(0,0,0,0.5);
+        justify-content: center;
+        align-items: center;
+    }
+    .modal-content {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        width: 90%;
+        max-width: 300px;
+        text-align: center;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+    .modal-buttons {
+        display: flex;
+        gap: 10px;
+        margin-top: 15px;
+    }
+    .btn-yes {
+        flex: 1;
+        background: black;
+        color: white;
+        border: none;
+        padding: 10px;
+        border-radius: 5px;
+    }
+    .btn-no {
+        flex: 1;
+        background: #ccc;
+        border: none;
+        padding: 10px;
+        border-radius: 5px;
+    }
+</style>
+</head>
+<body>
+
+<header>Electric Bill Calculator</header>
+
+<div class="container">
+    <label>Price per kWh (₱):</label>
+    <input type="number" id="price" placeholder="Enter price per kWh" oninput="calculate()">
+
+    <button onclick="addRoom()">+ Add Room</button>
+    <div id="rooms"></div>
+
+    <div class="total">
+        Total: ₱<span id="grandTotal">0.00</span>
+    </div>
+
+    <button onclick="showModal()">📷 Download Table as Image</button>
+
+    <div id="resultTable" style="margin-top:15px; display:none;"></div>
+</div>
+
+<!-- Modal -->
+<div class="modal" id="confirmModal">
+    <div class="modal-content">
+        <p>Download the table as an image?</p>
+        <div class="modal-buttons">
+            <button class="btn-yes" onclick="downloadTableImage()">Yes</button>
+            <button class="btn-no" onclick="closeModal()">No</button>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+<script>
+let roomCount = 0;
+
+function addRoom() {
+    roomCount++;
+    let roomsDiv = document.getElementById("rooms");
+
+    let roomDiv = document.createElement("div");
+    roomDiv.classList.add("room");
+    roomDiv.setAttribute("id", "room" + roomCount);
+    roomDiv.innerHTML = `
+        <h3>Room ${roomCount}</h3>
+        <label>Last Meter Reading:</label>
+        <input type="number" id="last${roomCount}" placeholder="Last reading" oninput="calculate()">
+        
+        <label>Current Meter Reading:</label>
+        <input type="number" id="current${roomCount}" placeholder="Current reading" oninput="calculate()">
+        
+        <div class="result">Cost: ₱<span id="cost${roomCount}">0.00</span></div>
+    `;
+    roomsDiv.appendChild(roomDiv);
+}
+
+function calculate() {
+    let price = parseFloat(document.getElementById("price").value) || 0;
+    let total = 0;
+
+    for (let i = 1; i <= roomCount; i++) {
+        let last = parseFloat(document.getElementById("last" + i)?.value) || 0;
+        let current = parseFloat(document.getElementById("current" + i)?.value) || 0;
+        let diff = current - last;
+        if (diff < 0) diff = 0;
+
+        let cost = diff * price;
+        document.getElementById("cost" + i).textContent = cost.toFixed(2);
+        total += cost;
+    }
+
+    document.getElementById("grandTotal").textContent = total.toFixed(2);
+}
+
+function generateTableHTML() {
+    let price = parseFloat(document.getElementById("price").value) || 0;
+    let tableHTML = `
+        <table>
+            <tr>
+                <th>Room</th>
+                <th>Last Meter</th>
+                <th>Current Meter</th>
+                <th>Consumed (kWh)</th>
+                <th>kWh Rate</th>
+                <th>Need to Pay</th>
+            </tr>
+    `;
+
+    for (let i = 1; i <= roomCount; i++) {
+        let last = parseFloat(document.getElementById("last" + i)?.value) || 0;
+        let current = parseFloat(document.getElementById("current" + i)?.value) || 0;
+        let diff = current - last;
+        if (diff < 0) diff = 0;
+
+        let cost = diff * price;
+        tableHTML += `
+            <tr>
+                <td>${i}</td>
+                <td>${last}</td>
+                <td>${current}</td>
+                <td>${diff}</td>
+                <td>${price}</td>
+                <td>₱${cost.toFixed(2)}</td>
+            </tr>
+        `;
+    }
+
+    tableHTML += "</table>";
+    document.getElementById("resultTable").innerHTML = tableHTML;
+}
+
+function showModal() {
+    generateTableHTML();
+    document.getElementById("confirmModal").style.display = "flex";
+}
+
+function closeModal() {
+    document.getElementById("confirmModal").style.display = "none";
+}
+
+function downloadTableImage() {
+    closeModal();
+    let table = document.getElementById("resultTable");
+    table.style.display = "block";
+
+    html2canvas(table, { scale: 2 }).then(canvas => {
+        let link = document.createElement('a');
+        link.download = 'electric_bill_table.png';
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+        table.style.display = "none";
+    });
+}
+</script>
+
+</body>
+</html>
