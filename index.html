@@ -219,6 +219,7 @@ function generateTableHTML() {
                 <th>kWh Rate</th>
                 <th>Number of Tenants</th>
                 <th>Need to Pay</th>
+                <th>Per Tenant</th>
             </tr>
     `;
 
@@ -232,6 +233,8 @@ function generateTableHTML() {
         let cost = diff * price;
         totalCost += cost;
 
+        let perTenant = tenants > 0 ? cost / tenants : 0;
+
         tableHTML += `
             <tr>
                 <td>${i}</td>
@@ -241,13 +244,14 @@ function generateTableHTML() {
                 <td>${price}</td>
                 <td>${tenants}</td>
                 <td>₱${cost.toFixed(2)}</td>
+                <td>₱${perTenant.toFixed(2)}</td>
             </tr>
         `;
     }
 
     tableHTML += `
         <tr>
-            <th colspan="6" style="text-align:right">Overall Total:</th>
+            <th colspan="7" style="text-align:right">Overall Total:</th>
             <th>₱${totalCost.toFixed(2)}</th>
         </tr>
     `;
@@ -270,7 +274,6 @@ function downloadTableImage() {
     let table = document.getElementById("resultTable");
     table.style.display = "block";
 
-    // Clone table into a wrapper so width is preserved
     let wrapper = document.createElement("div");
     wrapper.style.display = "inline-block";
     wrapper.style.background = "#fff";
