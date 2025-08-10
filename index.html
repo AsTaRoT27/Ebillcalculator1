@@ -100,7 +100,7 @@
         padding: 20px;
         border-radius: 10px;
         width: 90%;
-        max-width: 350px;
+        max-width: 300px;
         text-align: center;
         box-shadow: 0 4px 10px rgba(0,0,0,0.3);
     }
@@ -214,8 +214,7 @@ function generateTableHTML() {
                 <th>Consumed (kWh)</th>
                 <th>kWh Rate</th>
                 <th>Number of Tenants</th>
-                <th>Total Need to Pay</th>
-                <th>Per Tenant</th>
+                <th>Need to Pay</th>
             </tr>
     `;
 
@@ -227,8 +226,6 @@ function generateTableHTML() {
         if (diff < 0) diff = 0;
 
         let cost = diff * price;
-        let perTenant = tenants > 0 ? (cost / tenants) : 0;
-
         tableHTML += `
             <tr>
                 <td>${i}</td>
@@ -238,7 +235,6 @@ function generateTableHTML() {
                 <td>${price}</td>
                 <td>${tenants}</td>
                 <td>₱${cost.toFixed(2)}</td>
-                <td>₱${perTenant.toFixed(2)}</td>
             </tr>
         `;
     }
