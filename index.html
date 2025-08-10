@@ -24,7 +24,7 @@
         max-width: 500px;
         margin: auto;
     }
-    input, button {
+    input, button, select {
         width: 100%;
         padding: 10px;
         margin: 8px 0;
@@ -75,7 +75,7 @@
         background: white;
         font-size: 14px;
         table-layout: auto;
-        white-space: nowrap; /* prevent text compression */
+        white-space: nowrap;
     }
     th, td {
         border: 1px solid black;
@@ -129,22 +129,27 @@
 </style>
 </head>
 <body>
-
 <header>Electric Bill Calculator</header>
-
 <div class="container">
     <label>Price per kWh (₱):</label>
     <input type="number" id="price" placeholder="Enter price per kWh" oninput="calculate()">
 
+    <label>Select Room:</label>
+    <select id="roomSelector">
+        <option value="">-- Select a Room --</option>
+        <script>
+            for (let i = 1; i <= 20; i++) {
+                document.write(`<option value="${i}">Room ${i}</option>`);
+            }
+        </script>
+    </select>
     <button onclick="addRoom()">+ Add Room</button>
-    <div id="rooms"></div>
 
+    <div id="rooms"></div>
     <div class="total">
         Total: ₱<span id="grandTotal">0.00</span>
     </div>
-
     <button onclick="showModal()">📷 Download Table as Image</button>
-
     <div id="resultTable" style="margin-top:15px; display:none;"></div>
 </div>
 
@@ -160,29 +165,41 @@
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-
 <script>
-let roomCount = 0;
+let selectedRooms = [];
 
 function addRoom() {
-    roomCount++;
-    let roomsDiv = document.getElementById("rooms");
+    let selector = document.getElementById("roomSelector");
+    let selectedValue = selector.value;
 
+    if (!selectedValue) {
+        alert("Please select a room number!");
+        return;
+    }
+
+    if (selectedRooms.includes(selectedValue)) {
+        alert("This room has already been added!");
+        return;
+    }
+
+    selectedRooms.push(selectedValue);
+
+    let roomsDiv = document.getElementById("rooms");
     let roomDiv = document.createElement("div");
     roomDiv.classList.add("room");
-    roomDiv.setAttribute("id", "room" + roomCount);
+    roomDiv.setAttribute("id", "room" + selectedValue);
     roomDiv.innerHTML = `
-        <h3>Room ${roomCount}</h3>
+        <h3>Room ${selectedValue}</h3>
         <label>Last Meter Reading:</label>
-        <input type="number" id="last${roomCount}" placeholder="Last reading" oninput="calculate()">
+        <input type="number" id="last${selectedValue}" placeholder="Last reading" oninput="calculate()">
         
         <label>Current Meter Reading:</label>
-        <input type="number" id="current${roomCount}" placeholder="Current reading" oninput="calculate()">
-
-        <label>Number of Tenants:</label>
-        <input type="number" id="tenants${roomCount}" placeholder="Tenants count" oninput="calculate()">
+        <input type="number" id="current${selectedValue}" placeholder="Current reading" oninput="calculate()">
         
-        <div class="result">Cost: ₱<span id="cost${roomCount}">0.00</span></div>
+        <label>Number of Tenants:</label>
+        <input type="number" id="tenants${selectedValue}" placeholder="Tenants count" oninput="calculate()">
+        
+        <div class="result">Cost: ₱<span id="cost${selectedValue}">0.00</span></div>
     `;
     roomsDiv.appendChild(roomDiv);
 }
@@ -190,25 +207,21 @@ function addRoom() {
 function calculate() {
     let price = parseFloat(document.getElementById("price").value) || 0;
     let total = 0;
-
-    for (let i = 1; i <= roomCount; i++) {
-        let last = parseFloat(document.getElementById("last" + i)?.value) || 0;
-        let current = parseFloat(document.getElementById("current" + i)?.value) || 0;
+    for (let roomNum of selectedRooms) {
+        let last = parseFloat(document.getElementById("last" + roomNum)?.value) || 0;
+        let current = parseFloat(document.getElementById("current" + roomNum)?.value) || 0;
         let diff = current - last;
         if (diff < 0) diff = 0;
-
         let cost = diff * price;
-        document.getElementById("cost" + i).textContent = cost.toFixed(2);
+        document.getElementById("cost" + roomNum).textContent = cost.toFixed(2);
         total += cost;
     }
-
     document.getElementById("grandTotal").textContent = total.toFixed(2);
 }
 
 function generateTableHTML() {
     let price = parseFloat(document.getElementById("price").value) || 0;
     let totalCost = 0;
-
     let tableHTML = `
         <table>
             <tr>
@@ -222,22 +235,18 @@ function generateTableHTML() {
                 <th>Per Tenant</th>
             </tr>
     `;
-
-    for (let i = 1; i <= roomCount; i++) {
-        let last = parseFloat(document.getElementById("last" + i)?.value) || 0;
-        let current = parseFloat(document.getElementById("current" + i)?.value) || 0;
-        let tenants = parseInt(document.getElementById("tenants" + i)?.value) || 0;
+    for (let roomNum of selectedRooms) {
+        let last = parseFloat(document.getElementById("last" + roomNum)?.value) || 0;
+        let current = parseFloat(document.getElementById("current" + roomNum)?.value) || 0;
+        let tenants = parseInt(document.getElementById("tenants" + roomNum)?.value) || 0;
         let diff = current - last;
         if (diff < 0) diff = 0;
-
         let cost = diff * price;
         totalCost += cost;
-
         let perTenant = tenants > 0 ? cost / tenants : 0;
-
         tableHTML += `
             <tr>
-                <td>${i}</td>
+                <td>${roomNum}</td>
                 <td>${last}</td>
                 <td>${current}</td>
                 <td>${diff}</td>
@@ -248,7 +257,6 @@ function generateTableHTML() {
             </tr>
         `;
     }
-
     tableHTML += `
         <tr>
             <th colspan="7" style="text-align:right">Overall Total:</th>
@@ -256,7 +264,6 @@ function generateTableHTML() {
         </tr>
     `;
     tableHTML += "</table>";
-
     document.getElementById("resultTable").innerHTML = tableHTML;
 }
 
@@ -273,7 +280,6 @@ function downloadTableImage() {
     closeModal();
     let table = document.getElementById("resultTable");
     table.style.display = "block";
-
     let wrapper = document.createElement("div");
     wrapper.style.display = "inline-block";
     wrapper.style.background = "#fff";
@@ -281,7 +287,6 @@ function downloadTableImage() {
     wrapper.style.whiteSpace = "nowrap";
     wrapper.appendChild(table.cloneNode(true));
     document.body.appendChild(wrapper);
-
     html2canvas(wrapper, {
         scale: 2,
         windowWidth: wrapper.scrollWidth,
@@ -296,6 +301,5 @@ function downloadTableImage() {
     });
 }
 </script>
-
 </body>
 </html>
