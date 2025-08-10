@@ -74,12 +74,13 @@
         width: 100%;
         background: white;
         font-size: 14px;
+        table-layout: auto;
+        white-space: nowrap; /* prevent text compression */
     }
     th, td {
         border: 1px solid black;
-        padding: 8px 12px;
+        padding: 8px;
         text-align: center;
-        white-space: nowrap;
     }
     th {
         background-color: black;
@@ -206,7 +207,8 @@ function calculate() {
 
 function generateTableHTML() {
     let price = parseFloat(document.getElementById("price").value) || 0;
-    let totalPay = 0;
+    let totalCost = 0;
+
     let tableHTML = `
         <table>
             <tr>
@@ -228,7 +230,7 @@ function generateTableHTML() {
         if (diff < 0) diff = 0;
 
         let cost = diff * price;
-        totalPay += cost;
+        totalCost += cost;
 
         tableHTML += `
             <tr>
@@ -245,8 +247,8 @@ function generateTableHTML() {
 
     tableHTML += `
         <tr>
-            <td colspan="6" style="text-align:right;font-weight:bold;">Overall Total</td>
-            <td style="font-weight:bold;">₱${totalPay.toFixed(2)}</td>
+            <th colspan="6" style="text-align:right">Overall Total:</th>
+            <th>₱${totalCost.toFixed(2)}</th>
         </tr>
     `;
     tableHTML += "</table>";
@@ -268,15 +270,25 @@ function downloadTableImage() {
     let table = document.getElementById("resultTable");
     table.style.display = "block";
 
-    html2canvas(table, {
+    // Clone table into a wrapper so width is preserved
+    let wrapper = document.createElement("div");
+    wrapper.style.display = "inline-block";
+    wrapper.style.background = "#fff";
+    wrapper.style.padding = "20px";
+    wrapper.style.whiteSpace = "nowrap";
+    wrapper.appendChild(table.cloneNode(true));
+    document.body.appendChild(wrapper);
+
+    html2canvas(wrapper, {
         scale: 2,
-        windowWidth: 1600, // make it wide (landscape style)
+        windowWidth: wrapper.scrollWidth,
         backgroundColor: "#ffffff"
     }).then(canvas => {
         let link = document.createElement('a');
         link.download = 'electric_bill_table.png';
         link.href = canvas.toDataURL("image/png");
         link.click();
+        wrapper.remove();
         table.style.display = "none";
     });
 }
