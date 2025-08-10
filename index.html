@@ -176,6 +176,9 @@ function addRoom() {
         
         <label>Current Meter Reading:</label>
         <input type="number" id="current${roomCount}" placeholder="Current reading" oninput="calculate()">
+
+        <label>Number of Tenants:</label>
+        <input type="number" id="tenants${roomCount}" placeholder="Tenants count" oninput="calculate()">
         
         <div class="result">Cost: ₱<span id="cost${roomCount}">0.00</span></div>
     `;
@@ -210,6 +213,7 @@ function generateTableHTML() {
                 <th>Current Meter</th>
                 <th>Consumed (kWh)</th>
                 <th>kWh Rate</th>
+                <th>Number of Tenants</th>
                 <th>Need to Pay</th>
             </tr>
     `;
@@ -217,6 +221,7 @@ function generateTableHTML() {
     for (let i = 1; i <= roomCount; i++) {
         let last = parseFloat(document.getElementById("last" + i)?.value) || 0;
         let current = parseFloat(document.getElementById("current" + i)?.value) || 0;
+        let tenants = parseInt(document.getElementById("tenants" + i)?.value) || 0;
         let diff = current - last;
         if (diff < 0) diff = 0;
 
@@ -228,6 +233,7 @@ function generateTableHTML() {
                 <td>${current}</td>
                 <td>${diff}</td>
                 <td>${price}</td>
+                <td>${tenants}</td>
                 <td>₱${cost.toFixed(2)}</td>
             </tr>
         `;
