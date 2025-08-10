@@ -77,8 +77,9 @@
     }
     th, td {
         border: 1px solid black;
-        padding: 8px;
+        padding: 8px 12px;
         text-align: center;
+        white-space: nowrap;
     }
     th {
         background-color: black;
@@ -205,6 +206,7 @@ function calculate() {
 
 function generateTableHTML() {
     let price = parseFloat(document.getElementById("price").value) || 0;
+    let totalPay = 0;
     let tableHTML = `
         <table>
             <tr>
@@ -226,6 +228,8 @@ function generateTableHTML() {
         if (diff < 0) diff = 0;
 
         let cost = diff * price;
+        totalPay += cost;
+
         tableHTML += `
             <tr>
                 <td>${i}</td>
@@ -239,7 +243,14 @@ function generateTableHTML() {
         `;
     }
 
+    tableHTML += `
+        <tr>
+            <td colspan="6" style="text-align:right;font-weight:bold;">Overall Total</td>
+            <td style="font-weight:bold;">₱${totalPay.toFixed(2)}</td>
+        </tr>
+    `;
     tableHTML += "</table>";
+
     document.getElementById("resultTable").innerHTML = tableHTML;
 }
 
@@ -257,7 +268,11 @@ function downloadTableImage() {
     let table = document.getElementById("resultTable");
     table.style.display = "block";
 
-    html2canvas(table, { scale: 2 }).then(canvas => {
+    html2canvas(table, {
+        scale: 2,
+        windowWidth: 1600, // make it wide (landscape style)
+        backgroundColor: "#ffffff"
+    }).then(canvas => {
         let link = document.createElement('a');
         link.download = 'electric_bill_table.png';
         link.href = canvas.toDataURL("image/png");
