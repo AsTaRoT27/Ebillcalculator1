@@ -134,16 +134,15 @@
     <label>Price per kWh (₱):</label>
     <input type="number" id="price" placeholder="Enter price per kWh" oninput="calculate()">
 
-    <label>Select Room:</label>
-    <select id="roomSelector">
-        <option value="">-- Select a Room --</option>
+    <label>Select Rooms (hold CTRL or SHIFT for multiple):</label>
+    <select id="roomSelector" multiple size="6">
         <script>
             for (let i = 1; i <= 20; i++) {
                 document.write(`<option value="${i}">Room ${i}</option>`);
             }
         </script>
     </select>
-    <button onclick="addRoom()">+ Add Room</button>
+    <button onclick="addRoom()">+ Add Selected Rooms</button>
 
     <div id="rooms"></div>
     <div class="total">
@@ -170,38 +169,36 @@ let selectedRooms = [];
 
 function addRoom() {
     let selector = document.getElementById("roomSelector");
-    let selectedValue = selector.value;
+    let selectedValues = Array.from(selector.selectedOptions).map(opt => opt.value);
 
-    if (!selectedValue) {
-        alert("Please select a room number!");
+    if (selectedValues.length === 0) {
+        alert("Please select at least one room!");
         return;
     }
 
-    if (selectedRooms.includes(selectedValue)) {
-        alert("This room has already been added!");
-        return;
-    }
-
-    selectedRooms.push(selectedValue);
-
-    let roomsDiv = document.getElementById("rooms");
-    let roomDiv = document.createElement("div");
-    roomDiv.classList.add("room");
-    roomDiv.setAttribute("id", "room" + selectedValue);
-    roomDiv.innerHTML = `
-        <h3>Room ${selectedValue}</h3>
-        <label>Last Meter Reading:</label>
-        <input type="number" id="last${selectedValue}" placeholder="Last reading" oninput="calculate()">
-        
-        <label>Current Meter Reading:</label>
-        <input type="number" id="current${selectedValue}" placeholder="Current reading" oninput="calculate()">
-        
-        <label>Number of Tenants:</label>
-        <input type="number" id="tenants${selectedValue}" placeholder="Tenants count" oninput="calculate()">
-        
-        <div class="result">Cost: ₱<span id="cost${selectedValue}">0.00</span></div>
-    `;
-    roomsDiv.appendChild(roomDiv);
+    selectedValues.forEach(selectedValue => {
+        if (!selectedRooms.includes(selectedValue)) {
+            selectedRooms.push(selectedValue);
+            let roomsDiv = document.getElementById("rooms");
+            let roomDiv = document.createElement("div");
+            roomDiv.classList.add("room");
+            roomDiv.setAttribute("id", "room" + selectedValue);
+            roomDiv.innerHTML = `
+                <h3>Room ${selectedValue}</h3>
+                <label>Last Meter Reading:</label>
+                <input type="number" id="last${selectedValue}" placeholder="Last reading" oninput="calculate()">
+                
+                <label>Current Meter Reading:</label>
+                <input type="number" id="current${selectedValue}" placeholder="Current reading" oninput="calculate()">
+                
+                <label>Number of Tenants:</label>
+                <input type="number" id="tenants${selectedValue}" placeholder="Tenants count" oninput="calculate()">
+                
+                <div class="result">Cost: ₱<span id="cost${selectedValue}">0.00</span></div>
+            `;
+            roomsDiv.appendChild(roomDiv);
+        }
+    });
 }
 
 function calculate() {
