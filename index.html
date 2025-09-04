@@ -3,38 +3,37 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Electric Bill Calculator</title>
+  <title>Electric & Water Bill Calculator</title>
   <style>
-    body { font-family: Arial, sans-serif; background: #fff; color:#000; margin:0; padding:0;}
-    header { background:#000; color:#fff; text-align:center; padding:15px; font-size:1.2em;}
-    .container{ max-width:720px; margin:18px auto; padding:12px;}
-    input, select, button { width:100%; padding:10px; margin:8px 0; font-size:1rem; border:1px solid #000; border-radius:6px; box-sizing:border-box;}
+    body { font-family: Arial, sans-serif; background:#fff; margin:0; padding:0; }
+    header { background:#000; color:#fff; text-align:center; padding:15px; font-size:1.2em; }
+    .container { max-width:720px; margin:18px auto; padding:12px; }
+    input, select, button { width:100%; padding:10px; margin:8px 0; font-size:1rem; border:1px solid #000; border-radius:6px; box-sizing:border-box; }
     button { background:#000; color:#fff; cursor:pointer; }
-    button:hover{ background:#333;}
-    .room { border:1px solid #000; border-radius:6px; padding:12px; margin-top:12px; display:flex; flex-direction:column; gap:8px;}
-    .room h3{ margin:0; font-size:1.05em;}
-    .result{ font-weight:700; }
-    .totals { font-size:1.1em; text-align:center; margin-top:12px; padding:10px; border-top:2px solid #000;}
-    table{ border-collapse:collapse; width:100%; font-size:14px; background:#fff; white-space:nowrap;}
-    th, td{ border:1px solid #000; padding:8px; text-align:center;}
-    th{ background:#000; color:#fff; }
-    .modal{ display:none; position:fixed; left:0;top:0;width:100%;height:100%; background:rgba(0,0,0,0.5); z-index:20; align-items:center; justify-content:center;}
-    .modal-content{ background:#fff; padding:18px; border-radius:10px; width:90%; max-width:360px; text-align:center;}
-    .modal-buttons{ display:flex; gap:10px; margin-top:12px;}
-    .btn-yes{ flex:1; background:#000; color:#fff; border:none; padding:10px; border-radius:6px; }
-    .btn-no{ flex:1; background:#ccc; border:none; padding:10px; border-radius:6px; }
-    .small { font-size:0.9rem; color:#333; }
+    button:hover { background:#333; }
+    .room { border:1px solid #000; border-radius:6px; padding:12px; margin-top:12px; display:flex; flex-direction:column; gap:8px; }
+    .room h3 { margin:0; font-size:1.05em; }
+    .result { font-weight:700; }
+    .totals { font-size:1.1em; text-align:center; margin-top:12px; padding:10px; border-top:2px solid #000; }
+    table { border-collapse:collapse; width:100%; font-size:14px; background:#fff; white-space:nowrap; }
+    th, td { border:1px solid #000; padding:8px; text-align:center; }
+    th { background:#000; color:#fff; }
+    .modal { display:none; position:fixed; left:0; top:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:20; align-items:center; justify-content:center; }
+    .modal-content { background:#fff; padding:18px; border-radius:10px; width:90%; max-width:360px; text-align:center; }
+    .modal-buttons { display:flex; gap:10px; margin-top:12px; }
+    .btn-yes { flex:1; background:#000; color:#fff; border:none; padding:10px; border-radius:6px; }
+    .btn-no { flex:1; background:#ccc; border:none; padding:10px; border-radius:6px; }
   </style>
 </head>
 <body>
-  <header>Electric Bill Calculator</header>
+  <header>Electric & Water Bill Calculator</header>
 
   <div class="container">
     <label>Price per kWh (₱):</label>
     <input type="number" id="price" placeholder="Enter price per kWh" oninput="calculate()" min="0" step="0.01">
 
     <label>Water Bill (₱):</label>
-    <input type="number" id="waterBill" placeholder="Enter water bill (leave blank or 0 for N/A)" oninput="calculate()" min="0" step="0.01">
+    <input type="number" id="waterBill" placeholder="Enter water bill" oninput="calculate()" min="0" step="0.01">
 
     <label>Select Month:</label>
     <select id="month">
@@ -59,7 +58,8 @@
 
     <div class="totals">
       <div>Electric Total: ₱<span id="grandElectric">0.00</span></div>
-      <div>Water Total: <span id="grandWater">N/A</span></div>
+      <div>Total Water Bill: <span id="grandWater">N/A</span></div>
+      <div>Shared Water Bill (per tenant): <span id="sharedWater">N/A</span></div>
       <div style="margin-top:6px;">Combined Total (Electric + Water): ₱<span id="grandCombined">0.00</span></div>
     </div>
 
@@ -73,7 +73,7 @@
   <!-- Modal -->
   <div class="modal" id="confirmModal">
     <div class="modal-content">
-      <p class="small">Download the generated table as an image?</p>
+      <p>Download the generated table as an image?</p>
       <div class="modal-buttons">
         <button class="btn-yes" onclick="downloadTableImage()">Yes</button>
         <button class="btn-no" onclick="closeModal()">No</button>
@@ -108,7 +108,7 @@
             <label>Number of Tenants:</label>
             <input type="number" id="tenants${val}" placeholder="Tenants count" oninput="calculate()" min="0" step="1">
             <div class="result">Electric Cost: ₱<span id="cost${val}">0.00</span></div>
-            <div class="result">Room Total (Electric + Water): ₱<span id="roomTotal${val}">0.00</span></div>
+            <div class="result">Shared Water Bill (per tenant): <span id="waterShare${val}">N/A</span></div>
           `;
           roomsDiv.appendChild(roomDiv);
         }
@@ -118,18 +118,17 @@
 
     function calculate(){
       const price = parseFloat(document.getElementById("price").value) || 0;
-      const waterBillInput = document.getElementById("waterBill").value;
-      const waterBill = (waterBillInput === "" || Number(waterBillInput) === 0) ? 0 : parseFloat(waterBillInput);
-      
+      const waterBill = parseFloat(document.getElementById("waterBill").value) || 0;
+
+      // total tenants across all rooms
       let totalTenants = 0;
       for (const r of selectedRooms) {
-        const tenants = parseInt(document.getElementById("tenants" + r)?.value) || 0;
-        totalTenants += tenants;
+        totalTenants += parseInt(document.getElementById("tenants" + r)?.value) || 0;
       }
 
-      const waterPerTenant = (waterBill > 0 && totalTenants > 0) ? (waterBill / totalTenants) : NaN;
+      const sharedWaterBill = (waterBill > 0 && totalTenants > 0) ? (waterBill / totalTenants) : NaN;
+
       let grandElectric = 0;
-      let grandWater = (waterBill > 0 && totalTenants > 0) ? waterBill : 0;
 
       for (const r of selectedRooms) {
         const last = parseFloat(document.getElementById("last" + r)?.value) || 0;
@@ -140,30 +139,33 @@
         document.getElementById("cost" + r).textContent = cost.toFixed(2);
         grandElectric += cost;
 
-        const tenants = parseInt(document.getElementById("tenants" + r)?.value) || 0;
-        const roomWaterShare = (waterBill > 0 && totalTenants > 0 && Number.isFinite(waterPerTenant)) ? waterPerTenant * tenants : 0;
-        const roomTotal = cost + roomWaterShare;
-        document.getElementById("roomTotal" + r).textContent = roomTotal.toFixed(2);
+        if (waterBill > 0 && totalTenants > 0 && Number.isFinite(sharedWaterBill)) {
+          document.getElementById("waterShare" + r).textContent = "₱" + sharedWaterBill.toFixed(2);
+        } else {
+          document.getElementById("waterShare" + r).textContent = "N/A";
+        }
       }
 
       document.getElementById("grandElectric").textContent = grandElectric.toFixed(2);
-      document.getElementById("grandWater").textContent = (waterBill > 0 && totalTenants > 0) ? ("₱" + grandWater.toFixed(2)) : "N/A";
-      const combined = grandElectric + (waterBill > 0 && totalTenants > 0 ? grandWater : 0);
+      document.getElementById("grandWater").textContent = waterBill > 0 ? "₱" + waterBill.toFixed(2) : "N/A";
+      document.getElementById("sharedWater").textContent = (waterBill > 0 && totalTenants > 0) ? "₱" + sharedWaterBill.toFixed(2) : "N/A";
+      const combined = grandElectric + (waterBill > 0 ? waterBill : 0);
       document.getElementById("grandCombined").textContent = combined.toFixed(2);
     }
 
     function generateTableHTML(){
       const price = parseFloat(document.getElementById("price").value) || 0;
-      const waterBillInput = document.getElementById("waterBill").value;
-      const waterBill = (waterBillInput === "" || Number(waterBillInput) === 0) ? 0 : parseFloat(waterBillInput);
+      const waterBill = parseFloat(document.getElementById("waterBill").value) || 0;
       const month = document.getElementById("month").value;
       const year = document.getElementById("year").value;
 
       let totalTenants = 0;
       for (const r of selectedRooms) totalTenants += parseInt(document.getElementById("tenants" + r)?.value) || 0;
-      const waterPerTenant = (waterBill > 0 && totalTenants > 0) ? (waterBill / totalTenants) : NaN;
+
+      const sharedWaterBill = (waterBill > 0 && totalTenants > 0) ? (waterBill / totalTenants) : NaN;
 
       let totalElectric = 0;
+
       let html = '';
       html += `<h2 style="text-align:center; margin:0;">Tolentino Boarding House</h2>`;
       html += `<h3 style="text-align:center; margin:6px 0 12px 0;">Month: ${month} ${year}</h3>`;
@@ -176,7 +178,7 @@
           <th>kWh Rate</th>
           <th>Tenants</th>
           <th>Electric Bill</th>
-          <th>Room Total (E+W)</th>
+          <th>Shared Water Bill (per tenant)</th>
         </tr>`;
 
       for (const r of selectedRooms) {
@@ -188,9 +190,9 @@
         const electricCost = diff * price;
         totalElectric += electricCost;
 
-        let roomTotal = electricCost;
-        if (waterBill > 0 && totalTenants > 0 && tenants > 0 && Number.isFinite(waterPerTenant)) {
-          roomTotal = electricCost + (waterPerTenant * tenants);
+        let waterDisplay = "N/A";
+        if (waterBill > 0 && totalTenants > 0 && Number.isFinite(sharedWaterBill)) {
+          waterDisplay = "₱" + sharedWaterBill.toFixed(2);
         }
 
         html += `<tr>
@@ -201,12 +203,11 @@
           <td>₱${price.toFixed(2)}</td>
           <td>${tenants}</td>
           <td>₱${electricCost.toFixed(2)}</td>
-          <td>₱${roomTotal.toFixed(2)}</td>
+          <td>${waterDisplay}</td>
         </tr>`;
       }
 
-      const grandWaterDisplay = (waterBill > 0 && totalTenants > 0) ? ("₱" + waterBill.toFixed(2)) : "N/A";
-      const combinedTotal = totalElectric + (waterBill > 0 && totalTenants > 0 ? waterBill : 0);
+      const combinedTotal = totalElectric + (waterBill > 0 ? waterBill : 0);
 
       html += `<tr>
           <th colspan="6" style="text-align:right">Overall Electric Total:</th>
@@ -215,22 +216,18 @@
         </tr>
         <tr>
           <th colspan="6" style="text-align:right">Total Water Bill:</th>
-          <th colspan="2">${grandWaterDisplay}</th>
+          <th colspan="2">${waterBill > 0 ? "₱" + waterBill.toFixed(2) : "N/A"}</th>
+        </tr>
+        <tr>
+          <th colspan="6" style="text-align:right">Shared Water Bill (per tenant):</th>
+          <th colspan="2">${(waterBill > 0 && totalTenants > 0) ? "₱" + sharedWaterBill.toFixed(2) : "N/A"}</th>
         </tr>
         <tr>
           <th colspan="6" style="text-align:right">Combined Total (Electric + Water):</th>
           <th colspan="2">₱${combinedTotal.toFixed(2)}</th>
-        </tr>`;
+        </tr>
+      </table>`;
 
-      // ✅ Water share per head at bottom
-      if (waterBill > 0 && totalTenants > 0 && Number.isFinite(waterPerTenant)) {
-        html += `<tr>
-          <th colspan="6" style="text-align:right">Water Share Per Head:</th>
-          <th colspan="2">₱${waterPerTenant.toFixed(2)}</th>
-        </tr>`;
-      }
-
-      html += `</table>`;
       document.getElementById("resultTable").innerHTML = html;
       document.getElementById("resultTable").style.display = "block";
     }
@@ -261,8 +258,6 @@
         table.style.display = "none";
       });
     }
-
-    window.addEventListener('blur', calculate);
   </script>
 </body>
 </html>
