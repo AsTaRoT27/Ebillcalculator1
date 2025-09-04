@@ -236,79 +236,81 @@
     }
 
     function generateTableHTML() {
-      let price = parseFloat(document.getElementById("price").value) || 0;
-      let waterBill = parseFloat(document.getElementById("waterBill").value) || 0;
-      let month = document.getElementById("month").value;
-      let year = document.getElementById("year").value;
+  let price = parseFloat(document.getElementById("price").value) || 0;
+  let waterBill = parseFloat(document.getElementById("waterBill").value) || 0;
+  let month = document.getElementById("month").value;
+  let year = document.getElementById("year").value;
+  let totalCost = 0;
+  let totalTenants = 0;
 
-      let totalCost = 0;
-      let totalTenants = 0;
+  let tableHTML = `
+    <h2 style="text-align:center;">Tolentino Boarding House</h2>
+    <h3 style="text-align:center;">Month: ${month} ${year}</h3>
+    <table>
+      <tr>
+        <th>Room</th>
+        <th>Last Meter</th>
+        <th>Current Meter</th>
+        <th>Consumed (kWh)</th>
+        <th>kWh Rate</th>
+        <th>Number of Tenants</th>
+        <th>Need to Pay</th>
+        <th>Per Tenant</th>
+      </tr>
+  `;
 
-      let tableHTML = `
-        <h2 style="text-align:center;">Tolentino Boarding House</h2>
-        <h3 style="text-align:center;">Month: ${month} ${year}</h3>
-        <table>
-          <tr>
-            <th>Room</th>
-            <th>Last Meter</th>
-            <th>Current Meter</th>
-            <th>Consumed (kWh)</th>
-            <th>kWh Rate</th>
-            <th>Number of Tenants</th>
-            <th>Need to Pay</th>
-            <th>Per Tenant</th>
-          </tr>
-      `;
+  // First loop: calculate total tenants
+  for (let roomNum of selectedRooms) {
+    let tenants = parseInt(document.getElementById("tenants" + roomNum)?.value) || 0;
+    totalTenants += tenants;
+  }
 
-      // first loop to calculate totals
-      for (let roomNum of selectedRooms) {
-        let tenants = parseInt(document.getElementById("tenants" + roomNum)?.value) || 0;
-        totalTenants += tenants;
-      }
+  // Second loop: build rows
+  for (let roomNum of selectedRooms) {
+    let last = parseFloat(document.getElementById("last" + roomNum)?.value) || 0;
+    let current = parseFloat(document.getElementById("current" + roomNum)?.value) || 0;
+    let tenants = parseInt(document.getElementById("tenants" + roomNum)?.value) || 0;
+    let diff = current - last;
+    if (diff < 0) diff = 0;
+    let cost = diff * price;
+    totalCost += cost;
+    let perTenant = tenants > 0 ? cost / tenants : 0;
 
-      for (let roomNum of selectedRooms) {
-        let last = parseFloat(document.getElementById("last" + roomNum)?.value) || 0;
-        let current = parseFloat(document.getElementById("current" + roomNum)?.value) || 0;
-        let tenants = parseInt(document.getElementById("tenants" + roomNum)?.value) || 0;
-        let diff = current - last;
-        if (diff < 0) diff = 0;
-        let cost = diff * price;
-        totalCost += cost;
-        let perTenant = tenants > 0 ? cost / tenants : 0;
-        let waterShare = (waterBill > 0 && totalTenants > 0 && tenants > 0) ? (waterBill / totalTenants).toFixed(2) : "N/A";
+    tableHTML += `
+      <tr>
+        <td>${roomNum}</td>
+        <td>${last}</td>
+        <td>${current}</td>
+        <td>${diff}</td>
+        <td>${price}</td>
+        <td>${tenants}</td>
+        <td>₱${cost.toFixed(2)}</td>
+        <td>₱${perTenant.toFixed(2)}</td>
+      </tr>
+    `;
+  }
 
-        tableHTML += `
-          <tr>
-            <td>${roomNum}</td>
-            <td>${last}</td>
-            <td>${current}</td>
-            <td>${diff}</td>
-            <td>${price}</td>
-            <td>${tenants}</td>
-            <td>₱${cost.toFixed(2)}</td>
-            <td>₱${perTenant.toFixed(2)}</td>
-          </tr>
-        `;
-      }
+  // ✅ Fix: compute water share per tenant after knowing total tenants
+  let waterShareOverall = (waterBill > 0 && totalTenants > 0) ? waterBill / totalTenants : 0;
 
-      tableHTML += `
-        <tr>
-          <th colspan="7" style="text-align:right">Overall Total:</th>
-          <th colspan="2">₱${totalCost.toFixed(2)}</th>
-        </tr>
-        <tr>
-          <th colspan="7" style="text-align:right">Water Bill:</th>
-          <th colspan="2">${waterBill > 0 ? "₱" + waterBill.toFixed(2) : "N/A"}</th>
-        </tr>
-        <tr>
-          <th colspan="7" style="text-align:right">Water Bill Per Tenant:</th>
-          <th colspan="2">${waterShare > 0 ? "₱" + waterShare.toFixed(2) : "N/A"}</th>
-        </tr>
-      `;
-      tableHTML += "</table>";
+  tableHTML += `
+    <tr>
+      <th colspan="7" style="text-align:right">Overall Total:</th>
+      <th colspan="2">₱${totalCost.toFixed(2)}</th>
+    </tr>
+    <tr>
+      <th colspan="7" style="text-align:right">Water Bill:</th>
+      <th colspan="2">${waterBill > 0 ? "₱" + waterBill.toFixed(2) : "N/A"}</th>
+    </tr>
+    <tr>
+      <th colspan="7" style="text-align:right">Water Bill Per Tenant:</th>
+      <th colspan="2">${waterShareOverall > 0 ? "₱" + waterShareOverall.toFixed(2) : "N/A"}</th>
+    </tr>
+  `;
+  tableHTML += "</table>";
+  document.getElementById("resultTable").innerHTML = tableHTML;
+}
 
-      document.getElementById("resultTable").innerHTML = tableHTML;
-    }
 
     function showModal() {
       generateTableHTML();
