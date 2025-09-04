@@ -86,7 +86,6 @@
       background-color: black;
       color: white;
     }
-    /* Modal Styles */
     .modal {
       display: none;
       position: fixed;
@@ -176,7 +175,6 @@
     <div id="resultTable" style="margin-top:15px; display:none;"></div>
   </div>
 
-  <!-- Modal -->
   <div class="modal" id="confirmModal">
     <div class="modal-content">
       <p>Download the table as an image?</p>
@@ -244,6 +242,14 @@
       let totalCost = 0;
       let totalTenants = 0;
 
+      // First loop to calculate total tenants
+      for (let roomNum of selectedRooms) {
+        let tenants = parseInt(document.getElementById("tenants" + roomNum)?.value) || 0;
+        totalTenants += tenants;
+      }
+
+      let waterPerTenant = (waterBill > 0 && totalTenants > 0) ? (waterBill / totalTenants) : 0;
+
       let tableHTML = `
         <h2 style="text-align:center;">Tolentino Boarding House</h2>
         <h3 style="text-align:center;">Month: ${month} ${year}</h3>
@@ -255,17 +261,11 @@
             <th>Consumed (kWh)</th>
             <th>kWh Rate</th>
             <th>Number of Tenants</th>
-            <th>Need to Pay</th>
-            <th>Per Tenant</th>
+            <th>Electric Bill</th>
+            <th>Per Tenant (Electric)</th>
             <th>Water Share</th>
           </tr>
       `;
-
-      // first loop to calculate totals
-      for (let roomNum of selectedRooms) {
-        let tenants = parseInt(document.getElementById("tenants" + roomNum)?.value) || 0;
-        totalTenants += tenants;
-      }
 
       for (let roomNum of selectedRooms) {
         let last = parseFloat(document.getElementById("last" + roomNum)?.value) || 0;
@@ -275,8 +275,11 @@
         if (diff < 0) diff = 0;
         let cost = diff * price;
         totalCost += cost;
+
         let perTenant = tenants > 0 ? cost / tenants : 0;
-        let waterShare = (waterBill > 0 && totalTenants > 0 && tenants > 0) ? (waterBill / totalTenants).toFixed(2) : "N/A";
+        let waterShare = (waterBill > 0 && totalTenants > 0 && tenants > 0) 
+                        ? (waterPerTenant * tenants).toFixed(2) 
+                        : "N/A";
 
         tableHTML += `
           <tr>
@@ -295,11 +298,11 @@
 
       tableHTML += `
         <tr>
-          <th colspan="7" style="text-align:right">Overall Total:</th>
+          <th colspan="7" style="text-align:right">Overall Electric Total:</th>
           <th colspan="2">₱${totalCost.toFixed(2)}</th>
         </tr>
         <tr>
-          <th colspan="7" style="text-align:right">Water Bill:</th>
+          <th colspan="7" style="text-align:right">Total Water Bill:</th>
           <th colspan="2">${waterBill > 0 ? "₱" + waterBill.toFixed(2) : "N/A"}</th>
         </tr>
       `;
