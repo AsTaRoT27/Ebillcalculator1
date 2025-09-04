@@ -1,79 +1,183 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Electric & Water Bill Calculator</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Electric Bill Calculator</title>
   <style>
-    body { font-family: Arial, sans-serif; background:#fff; margin:0; padding:0; }
-    header { background:#000; color:#fff; text-align:center; padding:15px; font-size:1.2em; }
-    .container { max-width:720px; margin:18px auto; padding:12px; }
-    input, select, button { width:100%; padding:10px; margin:8px 0; font-size:1rem; border:1px solid #000; border-radius:6px; box-sizing:border-box; }
-    button { background:#000; color:#fff; cursor:pointer; }
-    button:hover { background:#333; }
-    .room { border:1px solid #000; border-radius:6px; padding:12px; margin-top:12px; display:flex; flex-direction:column; gap:8px; }
-    .room h3 { margin:0; font-size:1.05em; }
-    .result { font-weight:700; }
-    .totals { font-size:1.1em; text-align:center; margin-top:12px; padding:10px; border-top:2px solid #000; }
-    table { border-collapse:collapse; width:100%; font-size:14px; background:#fff; white-space:nowrap; }
-    th, td { border:1px solid #000; padding:8px; text-align:center; }
-    th { background:#000; color:#fff; }
-    .modal { display:none; position:fixed; left:0; top:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:20; align-items:center; justify-content:center; }
-    .modal-content { background:#fff; padding:18px; border-radius:10px; width:90%; max-width:360px; text-align:center; }
-    .modal-buttons { display:flex; gap:10px; margin-top:12px; }
-    .btn-yes { flex:1; background:#000; color:#fff; border:none; padding:10px; border-radius:6px; }
-    .btn-no { flex:1; background:#ccc; border:none; padding:10px; border-radius:6px; }
+    body {
+      font-family: Arial, sans-serif;
+      background-color: white;
+      color: black;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background-color: black;
+      color: white;
+      text-align: center;
+      padding: 15px;
+      font-size: 1.3em;
+    }
+    .container {
+      padding: 15px;
+      max-width: 600px;
+      margin: auto;
+    }
+    input, button, select {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      font-size: 1em;
+      border: 1px solid black;
+      border-radius: 5px;
+      box-sizing: border-box;
+    }
+    button {
+      background-color: black;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #333;
+    }
+    .room {
+      border: 1px solid black;
+      border-radius: 5px;
+      padding: 15px;
+      margin-top: 15px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .room h3 {
+      margin: 0 0 5px 0;
+      font-size: 1.1em;
+    }
+    label {
+      font-size: 0.9em;
+      margin-bottom: 3px;
+    }
+    .result {
+      font-weight: bold;
+      margin-top: 5px;
+    }
+    .total {
+      font-size: 1.2em;
+      text-align: center;
+      margin-top: 15px;
+      padding: 10px;
+      border-top: 2px solid black;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      background: white;
+      font-size: 14px;
+      table-layout: auto;
+      white-space: nowrap;
+    }
+    th, td {
+      border: 1px solid black;
+      padding: 8px;
+      text-align: center;
+    }
+    th {
+      background-color: black;
+      color: white;
+    }
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 10;
+      left: 0; top: 0;
+      width: 100%; height: 100%;
+      background-color: rgba(0,0,0,0.5);
+      justify-content: center;
+      align-items: center;
+    }
+    .modal-content {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      width: 90%;
+      max-width: 300px;
+      text-align: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+    .modal-buttons {
+      display: flex;
+      gap: 10px;
+      margin-top: 15px;
+    }
+    .btn-yes {
+      flex: 1;
+      background: black;
+      color: white;
+      border: none;
+      padding: 10px;
+      border-radius: 5px;
+    }
+    .btn-no {
+      flex: 1;
+      background: #ccc;
+      border: none;
+      padding: 10px;
+      border-radius: 5px;
+    }
   </style>
 </head>
 <body>
-  <header>Electric & Water Bill Calculator</header>
-
+  <header>Electric Bill Calculator</header>
   <div class="container">
     <label>Price per kWh (₱):</label>
-    <input type="number" id="price" placeholder="Enter price per kWh" oninput="calculate()" min="0" step="0.01">
+    <input type="number" id="price" placeholder="Enter price per kWh" oninput="calculate()">
 
     <label>Water Bill (₱):</label>
-    <input type="number" id="waterBill" placeholder="Enter water bill" oninput="calculate()" min="0" step="0.01">
+    <input type="number" id="waterBill" placeholder="Enter water bill" oninput="calculate()">
 
     <label>Select Month:</label>
     <select id="month">
-      <option>January</option><option>February</option><option>March</option><option>April</option>
-      <option>May</option><option>June</option><option>July</option><option>August</option>
-      <option>September</option><option>October</option><option>November</option><option>December</option>
+      <option value="January">January</option>
+      <option value="February">February</option>
+      <option value="March">March</option>
+      <option value="April">April</option>
+      <option value="May">May</option>
+      <option value="June">June</option>
+      <option value="July">July</option>
+      <option value="August">August</option>
+      <option value="September">September</option>
+      <option value="October">October</option>
+      <option value="November">November</option>
+      <option value="December">December</option>
     </select>
 
     <label>Enter Year:</label>
-    <input type="number" id="year" value="2025" min="1900" max="9999">
+    <input type="number" id="year" placeholder="Enter year" value="2025">
 
     <label>Select Rooms (hold CTRL or SHIFT for multiple):</label>
     <select id="roomSelector" multiple size="6">
       <script>
-        for (let i = 1; i <= 20; i++) document.write(`<option value="${i}">Room ${i}</option>`);
+        for (let i = 1; i <= 20; i++) {
+          document.write(`<option value="${i}">Room ${i}</option>`);
+        }
       </script>
     </select>
 
     <button onclick="addRoom()">+ Add Selected Rooms</button>
-
     <div id="rooms"></div>
 
-    <div class="totals">
-      <div>Electric Total: ₱<span id="grandElectric">0.00</span></div>
-      <div>Total Water Bill: <span id="grandWater">N/A</span></div>
-      <div>Shared Water Bill (per tenant): <span id="sharedWater">N/A</span></div>
-      <div style="margin-top:6px;">Combined Total (Electric + Water): ₱<span id="grandCombined">0.00</span></div>
+    <div class="total">
+      Total: ₱<span id="grandTotal">0.00</span>
     </div>
 
-    <div style="margin-top:12px;">
-      <button onclick="showModal()">📷 Download Table as Image</button>
-    </div>
-
+    <button onclick="showModal()">📷 Download Table as Image</button>
     <div id="resultTable" style="margin-top:15px; display:none;"></div>
   </div>
 
-  <!-- Modal -->
   <div class="modal" id="confirmModal">
     <div class="modal-content">
-      <p>Download the generated table as an image?</p>
+      <p>Download the table as an image?</p>
       <div class="modal-buttons">
         <button class="btn-yes" onclick="downloadTableImage()">Yes</button>
         <button class="btn-no" onclick="closeModal()">No</button>
@@ -85,173 +189,153 @@
   <script>
     let selectedRooms = [];
 
-    function addRoom(){
-      const selector = document.getElementById("roomSelector");
-      const selectedValues = Array.from(selector.selectedOptions).map(o => o.value);
+    function addRoom() {
+      let selector = document.getElementById("roomSelector");
+      let selectedValues = Array.from(selector.selectedOptions).map(opt => opt.value);
       if (selectedValues.length === 0) {
         alert("Please select at least one room!");
         return;
       }
-      const roomsDiv = document.getElementById("rooms");
-      selectedValues.forEach(val => {
-        if (!selectedRooms.includes(val)) {
-          selectedRooms.push(val);
-          const roomDiv = document.createElement("div");
-          roomDiv.className = "room";
-          roomDiv.id = "room" + val;
+      selectedValues.forEach(selectedValue => {
+        if (!selectedRooms.includes(selectedValue)) {
+          selectedRooms.push(selectedValue);
+          let roomsDiv = document.getElementById("rooms");
+          let roomDiv = document.createElement("div");
+          roomDiv.classList.add("room");
+          roomDiv.setAttribute("id", "room" + selectedValue);
           roomDiv.innerHTML = `
-            <h3>Room ${val}</h3>
+            <h3>Room ${selectedValue}</h3>
             <label>Last Meter Reading:</label>
-            <input type="number" id="last${val}" placeholder="Last reading" oninput="calculate()" min="0" step="0.01">
+            <input type="number" id="last${selectedValue}" placeholder="Last reading" oninput="calculate()">
             <label>Current Meter Reading:</label>
-            <input type="number" id="current${val}" placeholder="Current reading" oninput="calculate()" min="0" step="0.01">
+            <input type="number" id="current${selectedValue}" placeholder="Current reading" oninput="calculate()">
             <label>Number of Tenants:</label>
-            <input type="number" id="tenants${val}" placeholder="Tenants count" oninput="calculate()" min="0" step="1">
-            <div class="result">Electric Cost: ₱<span id="cost${val}">0.00</span></div>
-            <div class="result">Shared Water Bill (per tenant): <span id="waterShare${val}">N/A</span></div>
+            <input type="number" id="tenants${selectedValue}" placeholder="Tenants count" oninput="calculate()">
+            <div class="result">Cost: ₱<span id="cost${selectedValue}">0.00</span></div>
           `;
           roomsDiv.appendChild(roomDiv);
         }
       });
-      calculate();
     }
 
-    function calculate(){
-      const price = parseFloat(document.getElementById("price").value) || 0;
-      const waterBill = parseFloat(document.getElementById("waterBill").value) || 0;
-
-      // total tenants across all rooms
-      let totalTenants = 0;
-      for (const r of selectedRooms) {
-        totalTenants += parseInt(document.getElementById("tenants" + r)?.value) || 0;
-      }
-
-      const sharedWaterBill = (waterBill > 0 && totalTenants > 0) ? (waterBill / totalTenants) : NaN;
-
-      let grandElectric = 0;
-
-      for (const r of selectedRooms) {
-        const last = parseFloat(document.getElementById("last" + r)?.value) || 0;
-        const current = parseFloat(document.getElementById("current" + r)?.value) || 0;
+    function calculate() {
+      let price = parseFloat(document.getElementById("price").value) || 0;
+      let total = 0;
+      for (let roomNum of selectedRooms) {
+        let last = parseFloat(document.getElementById("last" + roomNum)?.value) || 0;
+        let current = parseFloat(document.getElementById("current" + roomNum)?.value) || 0;
         let diff = current - last;
-        if (!Number.isFinite(diff) || diff < 0) diff = 0;
-        const cost = diff * price;
-        document.getElementById("cost" + r).textContent = cost.toFixed(2);
-        grandElectric += cost;
-
-        if (waterBill > 0 && totalTenants > 0 && Number.isFinite(sharedWaterBill)) {
-          document.getElementById("waterShare" + r).textContent = "₱" + sharedWaterBill.toFixed(2);
-        } else {
-          document.getElementById("waterShare" + r).textContent = "N/A";
-        }
+        if (diff < 0) diff = 0;
+        let cost = diff * price;
+        document.getElementById("cost" + roomNum).textContent = cost.toFixed(2);
+        total += cost;
       }
-
-      document.getElementById("grandElectric").textContent = grandElectric.toFixed(2);
-      document.getElementById("grandWater").textContent = waterBill > 0 ? "₱" + waterBill.toFixed(2) : "N/A";
-      document.getElementById("sharedWater").textContent = (waterBill > 0 && totalTenants > 0) ? "₱" + sharedWaterBill.toFixed(2) : "N/A";
-      const combined = grandElectric + (waterBill > 0 ? waterBill : 0);
-      document.getElementById("grandCombined").textContent = combined.toFixed(2);
+      document.getElementById("grandTotal").textContent = total.toFixed(2);
     }
 
-    function generateTableHTML(){
-      const price = parseFloat(document.getElementById("price").value) || 0;
-      const waterBill = parseFloat(document.getElementById("waterBill").value) || 0;
-      const month = document.getElementById("month").value;
-      const year = document.getElementById("year").value;
+    function generateTableHTML() {
+      let price = parseFloat(document.getElementById("price").value) || 0;
+      let waterBill = parseFloat(document.getElementById("waterBill").value) || 0;
+      let month = document.getElementById("month").value;
+      let year = document.getElementById("year").value;
 
+      let totalCost = 0;
       let totalTenants = 0;
-      for (const r of selectedRooms) totalTenants += parseInt(document.getElementById("tenants" + r)?.value) || 0;
 
-      const sharedWaterBill = (waterBill > 0 && totalTenants > 0) ? (waterBill / totalTenants) : NaN;
+      // First loop to calculate total tenants
+      for (let roomNum of selectedRooms) {
+        let tenants = parseInt(document.getElementById("tenants" + roomNum)?.value) || 0;
+        totalTenants += tenants;
+      }
 
-      let totalElectric = 0;
+      let waterPerTenant = (waterBill > 0 && totalTenants > 0) ? (waterBill / totalTenants) : 0;
 
-      let html = '';
-      html += `<h2 style="text-align:center; margin:0;">Tolentino Boarding House</h2>`;
-      html += `<h3 style="text-align:center; margin:6px 0 12px 0;">Month: ${month} ${year}</h3>`;
-      html += `<table>
+      let tableHTML = `
+        <h2 style="text-align:center;">Tolentino Boarding House</h2>
+        <h3 style="text-align:center;">Month: ${month} ${year}</h3>
+        <table>
+          <tr>
+            <th>Room</th>
+            <th>Last Meter</th>
+            <th>Current Meter</th>
+            <th>Consumed (kWh)</th>
+            <th>kWh Rate</th>
+            <th>Number of Tenants</th>
+            <th>Electric Bill</th>
+            <th>Per Tenant (Electric)</th>
+            <th>Water Share</th>
+          </tr>
+      `;
+
+      for (let roomNum of selectedRooms) {
+        let last = parseFloat(document.getElementById("last" + roomNum)?.value) || 0;
+        let current = parseFloat(document.getElementById("current" + roomNum)?.value) || 0;
+        let tenants = parseInt(document.getElementById("tenants" + roomNum)?.value) || 0;
+        let diff = current - last;
+        if (diff < 0) diff = 0;
+        let cost = diff * price;
+        totalCost += cost;
+
+        let perTenant = tenants > 0 ? cost / tenants : 0;
+        let waterShare = (waterBill > 0 && totalTenants > 0 && tenants > 0) 
+                        ? (waterPerTenant * tenants).toFixed(2) 
+                        : "N/A";
+
+        tableHTML += `
+          <tr>
+            <td>${roomNum}</td>
+            <td>${last}</td>
+            <td>${current}</td>
+            <td>${diff}</td>
+            <td>${price}</td>
+            <td>${tenants}</td>
+            <td>₱${cost.toFixed(2)}</td>
+            <td>₱${perTenant.toFixed(2)}</td>
+            <td>${waterShare === "N/A" ? "N/A" : "₱" + waterShare}</td>
+          </tr>
+        `;
+      }
+
+      tableHTML += `
         <tr>
-          <th>Room</th>
-          <th>Last Meter</th>
-          <th>Current Meter</th>
-          <th>Consumed (kWh)</th>
-          <th>kWh Rate</th>
-          <th>Tenants</th>
-          <th>Electric Bill</th>
-          <th>Shared Water Bill (per tenant)</th>
-        </tr>`;
-
-      for (const r of selectedRooms) {
-        const last = parseFloat(document.getElementById("last" + r)?.value) || 0;
-        const current = parseFloat(document.getElementById("current" + r)?.value) || 0;
-        let diff = current - last;
-        if (!Number.isFinite(diff) || diff < 0) diff = 0;
-        const tenants = parseInt(document.getElementById("tenants" + r)?.value) || 0;
-        const electricCost = diff * price;
-        totalElectric += electricCost;
-
-        let waterDisplay = "N/A";
-        if (waterBill > 0 && totalTenants > 0 && Number.isFinite(sharedWaterBill)) {
-          waterDisplay = "₱" + sharedWaterBill.toFixed(2);
-        }
-
-        html += `<tr>
-          <td>${r}</td>
-          <td>${last}</td>
-          <td>${current}</td>
-          <td>${diff}</td>
-          <td>₱${price.toFixed(2)}</td>
-          <td>${tenants}</td>
-          <td>₱${electricCost.toFixed(2)}</td>
-          <td>${waterDisplay}</td>
-        </tr>`;
-      }
-
-      const combinedTotal = totalElectric + (waterBill > 0 ? waterBill : 0);
-
-      html += `<tr>
-          <th colspan="6" style="text-align:right">Overall Electric Total:</th>
-          <th>₱${totalElectric.toFixed(2)}</th>
-          <th></th>
+          <th colspan="7" style="text-align:right">Overall Electric Total:</th>
+          <th colspan="2">₱${totalCost.toFixed(2)}</th>
         </tr>
         <tr>
-          <th colspan="6" style="text-align:right">Total Water Bill:</th>
+          <th colspan="7" style="text-align:right">Total Water Bill:</th>
           <th colspan="2">${waterBill > 0 ? "₱" + waterBill.toFixed(2) : "N/A"}</th>
         </tr>
-        <tr>
-          <th colspan="6" style="text-align:right">Shared Water Bill (per tenant):</th>
-          <th colspan="2">${(waterBill > 0 && totalTenants > 0) ? "₱" + sharedWaterBill.toFixed(2) : "N/A"}</th>
-        </tr>
-        <tr>
-          <th colspan="6" style="text-align:right">Combined Total (Electric + Water):</th>
-          <th colspan="2">₱${combinedTotal.toFixed(2)}</th>
-        </tr>
-      </table>`;
+      `;
+      tableHTML += "</table>";
 
-      document.getElementById("resultTable").innerHTML = html;
-      document.getElementById("resultTable").style.display = "block";
+      document.getElementById("resultTable").innerHTML = tableHTML;
     }
 
-    function showModal(){
+    function showModal() {
       generateTableHTML();
       document.getElementById("confirmModal").style.display = "flex";
     }
-    function closeModal(){ document.getElementById("confirmModal").style.display = "none"; }
-
-    function downloadTableImage(){
+    function closeModal() {
+      document.getElementById("confirmModal").style.display = "none";
+    }
+    function downloadTableImage() {
       closeModal();
-      const table = document.getElementById("resultTable");
+      let table = document.getElementById("resultTable");
       table.style.display = "block";
-      const wrapper = document.createElement("div");
+      let wrapper = document.createElement("div");
       wrapper.style.display = "inline-block";
       wrapper.style.background = "#fff";
-      wrapper.style.padding = "18px";
+      wrapper.style.padding = "20px";
+      wrapper.style.whiteSpace = "nowrap";
       wrapper.appendChild(table.cloneNode(true));
       document.body.appendChild(wrapper);
-
-      html2canvas(wrapper, { scale:2, backgroundColor:"#ffffff" }).then(canvas => {
-        const link = document.createElement("a");
-        link.download = 'tolentino_billing_table.png';
+      html2canvas(wrapper, {
+        scale: 2,
+        windowWidth: wrapper.scrollWidth,
+        backgroundColor: "#ffffff"
+      }).then(canvas => {
+        let link = document.createElement('a');
+        link.download = 'electric_bill_table.png';
         link.href = canvas.toDataURL("image/png");
         link.click();
         wrapper.remove();
