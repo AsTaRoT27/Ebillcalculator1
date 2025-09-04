@@ -1,210 +1,229 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Electric Bill Calculator</title>
-<style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Electric Bill Calculator</title>
+  <style>
     body {
-        font-family: Arial, sans-serif;
-        background-color: white;
-        color: black;
-        margin: 0;
-        padding: 0;
+      font-family: Arial, sans-serif;
+      background-color: white;
+      color: black;
+      margin: 0;
+      padding: 0;
     }
     header {
-        background-color: black;
-        color: white;
-        text-align: center;
-        padding: 15px;
-        font-size: 1.3em;
+      background-color: black;
+      color: white;
+      text-align: center;
+      padding: 15px;
+      font-size: 1.3em;
     }
     .container {
-        padding: 15px;
-        max-width: 500px;
-        margin: auto;
+      padding: 15px;
+      max-width: 600px;
+      margin: auto;
     }
     input, button, select {
-        width: 100%;
-        padding: 10px;
-        margin: 8px 0;
-        font-size: 1em;
-        border: 1px solid black;
-        border-radius: 5px;
-        box-sizing: border-box;
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      font-size: 1em;
+      border: 1px solid black;
+      border-radius: 5px;
+      box-sizing: border-box;
     }
     button {
-        background-color: black;
-        color: white;
-        cursor: pointer;
+      background-color: black;
+      color: white;
+      cursor: pointer;
     }
     button:hover {
-        background-color: #333;
+      background-color: #333;
     }
     .room {
-        border: 1px solid black;
-        border-radius: 5px;
-        padding: 15px;
-        margin-top: 15px;
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
+      border: 1px solid black;
+      border-radius: 5px;
+      padding: 15px;
+      margin-top: 15px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
     }
     .room h3 {
-        margin: 0 0 5px 0;
-        font-size: 1.1em;
+      margin: 0 0 5px 0;
+      font-size: 1.1em;
     }
     label {
-        font-size: 0.9em;
-        margin-bottom: 3px;
+      font-size: 0.9em;
+      margin-bottom: 3px;
     }
     .result {
-        font-weight: bold;
-        margin-top: 5px;
+      font-weight: bold;
+      margin-top: 5px;
     }
     .total {
-        font-size: 1.2em;
-        text-align: center;
-        margin-top: 15px;
-        padding: 10px;
-        border-top: 2px solid black;
+      font-size: 1.2em;
+      text-align: center;
+      margin-top: 15px;
+      padding: 10px;
+      border-top: 2px solid black;
     }
     table {
-        border-collapse: collapse;
-        width: 100%;
-        background: white;
-        font-size: 14px;
-        table-layout: auto;
-        white-space: nowrap;
+      border-collapse: collapse;
+      width: 100%;
+      background: white;
+      font-size: 14px;
+      table-layout: auto;
+      white-space: nowrap;
     }
     th, td {
-        border: 1px solid black;
-        padding: 8px;
-        text-align: center;
+      border: 1px solid black;
+      padding: 8px;
+      text-align: center;
     }
     th {
-        background-color: black;
-        color: white;
+      background-color: black;
+      color: white;
     }
     /* Modal Styles */
     .modal {
-        display: none;
-        position: fixed;
-        z-index: 10;
-        left: 0; top: 0;
-        width: 100%; height: 100%;
-        background-color: rgba(0,0,0,0.5);
-        justify-content: center;
-        align-items: center;
+      display: none;
+      position: fixed;
+      z-index: 10;
+      left: 0; top: 0;
+      width: 100%; height: 100%;
+      background-color: rgba(0,0,0,0.5);
+      justify-content: center;
+      align-items: center;
     }
     .modal-content {
-        background: white;
-        padding: 20px;
-        border-radius: 10px;
-        width: 90%;
-        max-width: 300px;
-        text-align: center;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      width: 90%;
+      max-width: 300px;
+      text-align: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
     }
     .modal-buttons {
-        display: flex;
-        gap: 10px;
-        margin-top: 15px;
+      display: flex;
+      gap: 10px;
+      margin-top: 15px;
     }
     .btn-yes {
-        flex: 1;
-        background: black;
-        color: white;
-        border: none;
-        padding: 10px;
-        border-radius: 5px;
+      flex: 1;
+      background: black;
+      color: white;
+      border: none;
+      padding: 10px;
+      border-radius: 5px;
     }
     .btn-no {
-        flex: 1;
-        background: #ccc;
-        border: none;
-        padding: 10px;
-        border-radius: 5px;
+      flex: 1;
+      background: #ccc;
+      border: none;
+      padding: 10px;
+      border-radius: 5px;
     }
-</style>
+  </style>
 </head>
 <body>
-<header>Electric Bill Calculator</header>
-<div class="container">
+  <header>Electric Bill Calculator</header>
+  <div class="container">
     <label>Price per kWh (₱):</label>
     <input type="number" id="price" placeholder="Enter price per kWh" oninput="calculate()">
 
+    <label>Water Bill (₱):</label>
+    <input type="number" id="waterBill" placeholder="Enter water bill" oninput="calculate()">
+
+    <label>Select Month:</label>
+    <select id="month">
+      <option value="January">January</option>
+      <option value="February">February</option>
+      <option value="March">March</option>
+      <option value="April">April</option>
+      <option value="May">May</option>
+      <option value="June">June</option>
+      <option value="July">July</option>
+      <option value="August">August</option>
+      <option value="September">September</option>
+      <option value="October">October</option>
+      <option value="November">November</option>
+      <option value="December">December</option>
+    </select>
+
+    <label>Enter Year:</label>
+    <input type="number" id="year" placeholder="Enter year" value="2025">
+
     <label>Select Rooms (hold CTRL or SHIFT for multiple):</label>
     <select id="roomSelector" multiple size="6">
-        <script>
-            for (let i = 1; i <= 20; i++) {
-                document.write(`<option value="${i}">Room ${i}</option>`);
-            }
-        </script>
+      <script>
+        for (let i = 1; i <= 20; i++) {
+          document.write(`<option value="${i}">Room ${i}</option>`);
+        }
+      </script>
     </select>
-    <button onclick="addRoom()">+ Add Selected Rooms</button>
 
+    <button onclick="addRoom()">+ Add Selected Rooms</button>
     <div id="rooms"></div>
+
     <div class="total">
-        Total: ₱<span id="grandTotal">0.00</span>
+      Total: ₱<span id="grandTotal">0.00</span>
     </div>
+
     <button onclick="showModal()">📷 Download Table as Image</button>
     <div id="resultTable" style="margin-top:15px; display:none;"></div>
-</div>
+  </div>
 
-<!-- Modal -->
-<div class="modal" id="confirmModal">
+  <!-- Modal -->
+  <div class="modal" id="confirmModal">
     <div class="modal-content">
-        <p>Download the table as an image?</p>
-        <div class="modal-buttons">
-            <button class="btn-yes" onclick="downloadTableImage()">Yes</button>
-            <button class="btn-no" onclick="closeModal()">No</button>
-        </div>
+      <p>Download the table as an image?</p>
+      <div class="modal-buttons">
+        <button class="btn-yes" onclick="downloadTableImage()">Yes</button>
+        <button class="btn-no" onclick="closeModal()">No</button>
+      </div>
     </div>
-</div>
+  </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<script>
-let selectedRooms = [];
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script>
+    let selectedRooms = [];
 
-function addRoom() {
-    let selector = document.getElementById("roomSelector");
-    let selectedValues = Array.from(selector.selectedOptions).map(opt => opt.value);
-
-    if (selectedValues.length === 0) {
+    function addRoom() {
+      let selector = document.getElementById("roomSelector");
+      let selectedValues = Array.from(selector.selectedOptions).map(opt => opt.value);
+      if (selectedValues.length === 0) {
         alert("Please select at least one room!");
         return;
+      }
+      selectedValues.forEach(selectedValue => {
+        if (!selectedRooms.includes(selectedValue)) {
+          selectedRooms.push(selectedValue);
+          let roomsDiv = document.getElementById("rooms");
+          let roomDiv = document.createElement("div");
+          roomDiv.classList.add("room");
+          roomDiv.setAttribute("id", "room" + selectedValue);
+          roomDiv.innerHTML = `
+            <h3>Room ${selectedValue}</h3>
+            <label>Last Meter Reading:</label>
+            <input type="number" id="last${selectedValue}" placeholder="Last reading" oninput="calculate()">
+            <label>Current Meter Reading:</label>
+            <input type="number" id="current${selectedValue}" placeholder="Current reading" oninput="calculate()">
+            <label>Number of Tenants:</label>
+            <input type="number" id="tenants${selectedValue}" placeholder="Tenants count" oninput="calculate()">
+            <div class="result">Cost: ₱<span id="cost${selectedValue}">0.00</span></div>
+          `;
+          roomsDiv.appendChild(roomDiv);
+        }
+      });
     }
 
-    selectedValues.forEach(selectedValue => {
-        if (!selectedRooms.includes(selectedValue)) {
-            selectedRooms.push(selectedValue);
-            let roomsDiv = document.getElementById("rooms");
-            let roomDiv = document.createElement("div");
-            roomDiv.classList.add("room");
-            roomDiv.setAttribute("id", "room" + selectedValue);
-            roomDiv.innerHTML = `
-                <h3>Room ${selectedValue}</h3>
-                <label>Last Meter Reading:</label>
-                <input type="number" id="last${selectedValue}" placeholder="Last reading" oninput="calculate()">
-                
-                <label>Current Meter Reading:</label>
-                <input type="number" id="current${selectedValue}" placeholder="Current reading" oninput="calculate()">
-                
-                <label>Number of Tenants:</label>
-                <input type="number" id="tenants${selectedValue}" placeholder="Tenants count" oninput="calculate()">
-                
-                <div class="result">Cost: ₱<span id="cost${selectedValue}">0.00</span></div>
-            `;
-            roomsDiv.appendChild(roomDiv);
-        }
-    });
-}
-
-function calculate() {
-    let price = parseFloat(document.getElementById("price").value) || 0;
-    let total = 0;
-    for (let roomNum of selectedRooms) {
+    function calculate() {
+      let price = parseFloat(document.getElementById("price").value) || 0;
+      let total = 0;
+      for (let roomNum of selectedRooms) {
         let last = parseFloat(document.getElementById("last" + roomNum)?.value) || 0;
         let current = parseFloat(document.getElementById("current" + roomNum)?.value) || 0;
         let diff = current - last;
@@ -212,27 +231,43 @@ function calculate() {
         let cost = diff * price;
         document.getElementById("cost" + roomNum).textContent = cost.toFixed(2);
         total += cost;
+      }
+      document.getElementById("grandTotal").textContent = total.toFixed(2);
     }
-    document.getElementById("grandTotal").textContent = total.toFixed(2);
-}
 
-function generateTableHTML() {
-    let price = parseFloat(document.getElementById("price").value) || 0;
-    let totalCost = 0;
-    let tableHTML = `
+    function generateTableHTML() {
+      let price = parseFloat(document.getElementById("price").value) || 0;
+      let waterBill = parseFloat(document.getElementById("waterBill").value) || 0;
+      let month = document.getElementById("month").value;
+      let year = document.getElementById("year").value;
+
+      let totalCost = 0;
+      let totalTenants = 0;
+
+      let tableHTML = `
+        <h2 style="text-align:center;">Tolentino Boarding House</h2>
+        <h3 style="text-align:center;">Month: ${month} ${year}</h3>
         <table>
-            <tr>
-                <th>Room</th>
-                <th>Last Meter</th>
-                <th>Current Meter</th>
-                <th>Consumed (kWh)</th>
-                <th>kWh Rate</th>
-                <th>Number of Tenants</th>
-                <th>Need to Pay</th>
-                <th>Per Tenant</th>
-            </tr>
-    `;
-    for (let roomNum of selectedRooms) {
+          <tr>
+            <th>Room</th>
+            <th>Last Meter</th>
+            <th>Current Meter</th>
+            <th>Consumed (kWh)</th>
+            <th>kWh Rate</th>
+            <th>Number of Tenants</th>
+            <th>Need to Pay</th>
+            <th>Per Tenant</th>
+            <th>Water Share</th>
+          </tr>
+      `;
+
+      // first loop to calculate totals
+      for (let roomNum of selectedRooms) {
+        let tenants = parseInt(document.getElementById("tenants" + roomNum)?.value) || 0;
+        totalTenants += tenants;
+      }
+
+      for (let roomNum of selectedRooms) {
         let last = parseFloat(document.getElementById("last" + roomNum)?.value) || 0;
         let current = parseFloat(document.getElementById("current" + roomNum)?.value) || 0;
         let tenants = parseInt(document.getElementById("tenants" + roomNum)?.value) || 0;
@@ -241,62 +276,69 @@ function generateTableHTML() {
         let cost = diff * price;
         totalCost += cost;
         let perTenant = tenants > 0 ? cost / tenants : 0;
+        let waterShare = (waterBill > 0 && totalTenants > 0 && tenants > 0) ? (waterBill / totalTenants).toFixed(2) : "N/A";
+
         tableHTML += `
-            <tr>
-                <td>${roomNum}</td>
-                <td>${last}</td>
-                <td>${current}</td>
-                <td>${diff}</td>
-                <td>${price}</td>
-                <td>${tenants}</td>
-                <td>₱${cost.toFixed(2)}</td>
-                <td>₱${perTenant.toFixed(2)}</td>
-            </tr>
+          <tr>
+            <td>${roomNum}</td>
+            <td>${last}</td>
+            <td>${current}</td>
+            <td>${diff}</td>
+            <td>${price}</td>
+            <td>${tenants}</td>
+            <td>₱${cost.toFixed(2)}</td>
+            <td>₱${perTenant.toFixed(2)}</td>
+            <td>${waterShare === "N/A" ? "N/A" : "₱" + waterShare}</td>
+          </tr>
         `;
-    }
-    tableHTML += `
+      }
+
+      tableHTML += `
         <tr>
-            <th colspan="7" style="text-align:right">Overall Total:</th>
-            <th>₱${totalCost.toFixed(2)}</th>
+          <th colspan="7" style="text-align:right">Overall Total:</th>
+          <th colspan="2">₱${totalCost.toFixed(2)}</th>
         </tr>
-    `;
-    tableHTML += "</table>";
-    document.getElementById("resultTable").innerHTML = tableHTML;
-}
+        <tr>
+          <th colspan="7" style="text-align:right">Water Bill:</th>
+          <th colspan="2">${waterBill > 0 ? "₱" + waterBill.toFixed(2) : "N/A"}</th>
+        </tr>
+      `;
+      tableHTML += "</table>";
 
-function showModal() {
-    generateTableHTML();
-    document.getElementById("confirmModal").style.display = "flex";
-}
+      document.getElementById("resultTable").innerHTML = tableHTML;
+    }
 
-function closeModal() {
-    document.getElementById("confirmModal").style.display = "none";
-}
-
-function downloadTableImage() {
-    closeModal();
-    let table = document.getElementById("resultTable");
-    table.style.display = "block";
-    let wrapper = document.createElement("div");
-    wrapper.style.display = "inline-block";
-    wrapper.style.background = "#fff";
-    wrapper.style.padding = "20px";
-    wrapper.style.whiteSpace = "nowrap";
-    wrapper.appendChild(table.cloneNode(true));
-    document.body.appendChild(wrapper);
-    html2canvas(wrapper, {
+    function showModal() {
+      generateTableHTML();
+      document.getElementById("confirmModal").style.display = "flex";
+    }
+    function closeModal() {
+      document.getElementById("confirmModal").style.display = "none";
+    }
+    function downloadTableImage() {
+      closeModal();
+      let table = document.getElementById("resultTable");
+      table.style.display = "block";
+      let wrapper = document.createElement("div");
+      wrapper.style.display = "inline-block";
+      wrapper.style.background = "#fff";
+      wrapper.style.padding = "20px";
+      wrapper.style.whiteSpace = "nowrap";
+      wrapper.appendChild(table.cloneNode(true));
+      document.body.appendChild(wrapper);
+      html2canvas(wrapper, {
         scale: 2,
         windowWidth: wrapper.scrollWidth,
         backgroundColor: "#ffffff"
-    }).then(canvas => {
+      }).then(canvas => {
         let link = document.createElement('a');
         link.download = 'electric_bill_table.png';
         link.href = canvas.toDataURL("image/png");
         link.click();
         wrapper.remove();
         table.style.display = "none";
-    });
-}
-</script>
+      });
+    }
+  </script>
 </body>
 </html>
