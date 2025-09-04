@@ -257,7 +257,6 @@
             <th>Number of Tenants</th>
             <th>Need to Pay</th>
             <th>Per Tenant</th>
-            <th>Water Share</th>
           </tr>
       `;
 
@@ -288,7 +287,6 @@
             <td>${tenants}</td>
             <td>₱${cost.toFixed(2)}</td>
             <td>₱${perTenant.toFixed(2)}</td>
-            <td>${waterShare === "N/A" ? "N/A" : "₱" + waterShare}</td>
           </tr>
         `;
       }
@@ -301,6 +299,10 @@
         <tr>
           <th colspan="7" style="text-align:right">Water Bill:</th>
           <th colspan="2">${waterBill > 0 ? "₱" + waterBill.toFixed(2) : "N/A"}</th>
+        </tr>
+        <tr>
+          <th colspan="7" style="text-align:right">Water Bill Per Tenant:</th>
+          <th colspan="2">${waterShare > 0 ? "₱" + waterShare.toFixed(2) : "N/A"}</th>
         </tr>
       `;
       tableHTML += "</table>";
